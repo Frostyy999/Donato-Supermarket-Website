@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Todo App</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d1f3d 100%);
+      min-height: 100vh;
+      padding: 40px 20px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .app-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    h1 {
+      color: #9c27b0;
+      font-size: 2.5em;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .add-task {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 30px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.9);
+      font-family: inherit;
+    }
+
+    .add-btn {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .add-btn:hover {
+      background: #45a049;
+      transform: translateY(-2px);
+    }
+
+    .todo-item {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .todo-item:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .todo-content {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    .task {
+      font-weight: 600;
+      color: #333;
+      font-size: 1.1em;
+      margin-bottom: 5px;
+    }
+
+    .task-details {
+      display: flex;
+      gap: 20px;
+      font-size: 0.9em;
+      color: #666;
+    }
+
+    .todo-item.completed .task {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.8em;
+      font-weight: 600;
+    }
+
+    .status-pending {
+      background: #fff3e0;
+      color: #f57c00;
+    }
+
+    .status-completed {
+      background: #e8f5e9;
+      color: #4caf50;
+    }
+
+    .action-btn {
+      background: transparent;
+      border: 2px solid #4caf50;
+      color: #4caf50;
+      padding: 8px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+
+    .action-btn:hover {
+      background: #4caf50;
+      color: white;
+    }
+
+    .action-btn i {
+      margin-right: 5px;
+    }
+
+    @media (max-width: 600px) {
+      .todo-item {
+        flex-direction: column;
+        text-align: center;
+        gap: 15px;
+      }
+
+      .task-details {
+        justify-content: center;
+      }
+
+      .todo-content {
+        margin-right: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="app-header">
+      <h1>✨ Todo App</h1>
+    </div>
+    <div class="add-task">
+      <div class="input-group">
+        <input type="text" id="taskInput" placeholder="Add a new task...">
+        <input type="date" id="dateInput">
+        <button class="add-btn" onclick="addNewTask()">
+          <i class="fas fa-plus"></i> Add Task
+        </button>
+      </div>
+    </div>
+    <div id="todo-list"></div>
+  </div>
+
+  <script>
+    class TodoItem {
+      constructor(task, dueDate) {
+        this.task = task;
+        this.dueDate = dueDate;
+        this.completed = false;
+      }
+    }
+
+    class TodoList {
+      constructor() {
+        this.items = [];
+      }
+
+      addItem(item) {
+        this.items.push(item);
+        this.renderList();
+      }
+
+      completeItem(taskName) {
+        const item = this.items.find(i => i.task === taskName);
+        if (item) {
+          item.completed = !item.completed; // Toggle completion
+          this.renderList();
+        }
+      }
+
+      renderList() {
+        const todoListElement = document.getElementById('todo-list');
+        todoListElement.innerHTML = '';
+
+        this.items.forEach(item => {
+          const todoItem = document.createElement('div');
+          todoItem.classList.add('todo-item');
+          if (item.completed) {
+            todoItem.classList.add('completed');
+          }
+
+          const statusClass = item.completed ? 'status-completed' : 'status-pending';
+          const statusText = item.completed ? 'Completed' : 'Pending';
+          const buttonText = item.completed ? 'Undo' : 'Complete';
+          const buttonIcon = item.completed ? 'fa-undo' : 'fa-check';
+
+          todoItem.innerHTML = `
+            <div class="todo-content">
+              <div class="task">${item.task}</div>
+              <div class="task-details">
+                <div class="due-date">
+                  <i class="far fa-calendar-alt"></i> ${item.dueDate}
+                </div>
+                <span class="status-badge ${statusClass}">
+                  ${statusText}
+                </span>
+              </div>
+            </div>
+            <button class="action-btn" onclick="todoList.completeItem('${item.task}')">
+              <i class="fas ${buttonIcon}"></i> ${buttonText}
+            </button>
+          `;
+
+          todoListElement.appendChild(todoItem);
+        });
+      }
+    }
+
+    const todoList = new TodoList();
+
+    function addNewTask() {
+      const taskInput = document.getElementById('taskInput');
+      const dateInput = document.getElementById('dateInput');
+      
+      if (taskInput.value.trim() !== '' && dateInput.value !== '') {
+        todoList.addItem(new TodoItem(taskInput.value.trim(), dateInput.value));
+        taskInput.value = '';
+        dateInput.value = '';
+      }
+    }
+
+    // Initialize with sample tasks
+    todoList.addItem(new TodoItem('Finish homework', '2023-05-15'));
+    todoList.addItem(new TodoItem('Clean room', '2023-05-20'));
+    todoList.addItem(new TodoItem('Study for exam', '2023-05-25'));
+    todoList.renderList();
+  </script>
+</body>
+</html>

@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K.D Gaile Supermarket - Products</title>
+    <link rel="stylesheet" href="market.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+        }
+        /* Styling for the Return to Checkout Button */
+        .btn-return-checkout {
+            background-color: #6A0DAD;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 20px;
+        }
+
+        .btn-return-checkout:hover {
+            background-color: #590BA6;
+        }
+
+        /* Basic Cart Styling */
+        .cart-section {
+            padding: 20px;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+
+        .btn-checkout {
+            background-color: #6A0DAD;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .btn-checkout:hover {
+            background-color: #590BA6;
+        }
+
+        /* Search Bar Styling */
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 10px;
+            border: 2px solid #6A0DAD;
+            border-radius: 20px; /* Made more rounded */
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease; /* Added transition for smooth hover effect */
+        }
+
+        .search-input:hover {
+            box-shadow: 0 0 10px rgba(106, 13, 173, 0.3); /* Hover effect with subtle shadow */
+            border-color: #590BA6; /* Slight color change on hover */
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 0 15px rgba(106, 13, 173, 0.5); /* Enhanced effect when focused */
+            border-color: #490896;
+        }
+
+        /* Hide products that don't match search */
+        .product-item.hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <!-- Same header as index.html -->
+    </header>
+
+    <section id="products" class="products-section">
+        <h2>Our Products</h2>
+        
+        <!-- Search Bar -->
+        <div class="search-container">
+            <input type="text" id="search-bar" class="search-input" placeholder="Search products..." oninput="searchProducts()">
+        </div>
+
+        <div class="product-list">
+            <div class="product-item">
+                <img src="rice.jpg" alt="Rice">
+                <h3>Rice</h3>
+                <p>$15.00</p>
+                <button onclick="addToCart('Rice', 15)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="sugar.jpg" alt="Sugar">
+                <h3>Sugar</h3>
+                <p>$8.00</p>
+                <button onclick="addToCart('Sugar', 8)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="bread.jpg" alt="Bread">
+                <h3>Bread</h3>
+                <p>$5.00</p>
+                <button onclick="addToCart('Bread', 5)">Add to Cart</button>
+            </div>
+            <!-- New Products -->
+            <div class="product-item">
+                <img src="milk.jpg" alt="Milk">
+                <h3>Milk</h3>
+                <p>$4.50</p>
+                <button onclick="addToCart('Milk', 4.50)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="eggs.jpg" alt="Eggs">
+                <h3>Eggs (Dozen)</h3>
+                <p>$6.00</p>
+                <button onclick="addToCart('Eggs', 6)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="pasta.jpg" alt="Pasta">
+                <h3>Pasta</h3>
+                <p>$3.50</p>
+                <button onclick="addToCart('Pasta', 3.50)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="tomato_sauce.jpg" alt="Tomato Sauce">
+                <h3>Tomato Sauce</h3>
+                <p>$4.00</p>
+                <button onclick="addToCart('Tomato Sauce', 4)">Add to Cart</button>
+            </div>
+            <div class="product-item">
+                <img src="cheese.jpg" alt="Cheese">
+                <h3>Cheese</h3>
+                <p>$7.50</p>
+                <button onclick="addToCart('Cheese', 7.50)">Add to Cart</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Section -->
+    <section id="cart" class="cart-section">
+        <h2>Your Cart</h2>
+        <div class="cart-items"></div>
+        <h3>Total: $<span id="total-amount">0.00</span></h3>
+        <button class="btn-checkout" onclick="checkout()">Proceed to Checkout</button>
+        <!-- Return to Checkout Button -->
+        <button class="btn-return-checkout" onclick="returnToCheckout()">Return to Checkout</button>
+    </section>
+
+    <!-- Payment Section -->
+    <section id="payment" class="payment-section" style="display: none;">
+        <h2>Payment Details</h2>
+        <form id="payment-form" onsubmit="processPayment(event)">
+            <!-- Payment form fields -->
+        </form>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 K.D Gaile Supermarket. All rights reserved.</p>
+    </footer>
+
+    <script src="market.js"></script>
+    <script>
+        // Function for returning to the checkout section
+        function returnToCheckout() {
+            document.getElementById('cart').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Search functionality
+        function searchProducts() {
+            const searchTerm = document.getElementById('search-bar').value.toLowerCase();
+            const productItems = document.querySelectorAll('.product-item');
+
+            productItems.forEach(item => {
+                const productName = item.querySelector('h3').textContent.toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+    </script>
+</body>
+</html>
